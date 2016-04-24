@@ -18,6 +18,7 @@ void update_student(struct StudentInfo* infoptr, struct StudentInfo new) {
     // that is empty, or until the end of the database is reached
     while(strcmp(infoptr[i].name, "") && i < MAX_DATABASE_SIZE) {
         if(!strcmp(infoptr[i].sID, new.sID)) {
+
             strcpy(infoptr[i].name, new.name); 
             strcpy(infoptr[i].telNumber, new.telNumber);
             strcpy(infoptr[i].address, new.address);
