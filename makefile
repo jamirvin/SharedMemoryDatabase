@@ -1,10 +1,10 @@
 all: Load Change Print Query Clean
 
-Load: Load.c header.h 
+Load: Load.c header.h header.c
 	gcc -o Load Load.c header.c
 Change: Change.c header.h
 	gcc -o Change Change.c header.c
-Print: Print.c header.h
+Print: Print.c header.h header.c
 	gcc -o Print Print.c header.c
 Query: Query.c header.h
 	gcc -o Query Query.c header.c

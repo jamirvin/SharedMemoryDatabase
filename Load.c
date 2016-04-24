@@ -7,51 +7,7 @@
 #include <sys/sem.h>
 #include "header.h"
 
-struct StudentInfo* getDatabase() {
-    int id;
-    struct StudentInfo* infoptr;
-
-    // Create the shared memory block big enough to hold 20 database
-    // entries.
-    id = shmget(KEY, SEGSIZE * 20, IPC_CREAT|0600);
-    if(id < 0) {
-        perror("Load: shmget failed");
-        exit(1);
-    }
-
-    // Attach the shared memory to this process memory
-    infoptr = (struct StudentInfo*)shmat(id, 0, 0);
-    if(infoptr <= (struct StudentInfo*)(0)) {
-        perror("Load: shmat failed");
-        exit(2);
-    }
-
-    return infoptr;
-}
-
-int* getReadcount() {
-    int id;
-    int* readers;
-
-    // Create the shared memory block big enough to hold 20 database
-    // entries.
-    id = shmget(READ_KEY, READ_SIZE, IPC_CREAT|0600);
-    if(id < 0) {
-        perror("Load: shmget failed");
-        exit(1);
-    }
-
-    // Attach the shared memory to this process memory
-    readers = (int*)shmat(id, 0, 0);
-    if(readers <= (int*)(0)) {
-        perror("Load: shmat failed");
-        exit(1);
-    }
-
-    return readers;
-}
-
-void crit_section(struct StudentInfo* infoptr, int* num_readers, char* filename) {
+void load_data(struct StudentInfo* infoptr, int* num_readers, char* filename) {
     (*num_readers) = 0;
     int is = 1;
     int counter = 0;
@@ -68,19 +24,27 @@ void crit_section(struct StudentInfo* infoptr, int* num_readers, char* filename)
 
     while((read = getline(&line, &len, fp)) != -1) {
         int type = counter % 4;
+        int entry = counter / 4;
+        if(line[read-1] == '\n') {
+            line[read-1] = '\0';
+        }
 
         switch(type) {
             case 0:
-                strcpy(infoptr[counter].name, line);
+                strcpy(infoptr[entry].name, line);
+                //printf("%s\n", infoptr[entry].name);
                 break;
             case 1:
-                strcpy(infoptr[counter].sID, line);
+                strcpy(infoptr[entry].sID, line);
+                //printf("%s\n", infoptr[entry].sID);
                 break;
             case 2:
-                strcpy(infoptr[counter].address, line);
+                strcpy(infoptr[entry].address, line);
+                //printf("%s\n", infoptr[entry].address);
                 break;
             case 3:
-                strcpy(infoptr[counter].telNumber, line);
+                strcpy(infoptr[entry].telNumber, line);
+                //printf("%s\n", infoptr[entry].telNumber);
                 break;
         }
         ++counter;
@@ -102,8 +66,8 @@ int main(int argc, char** argv) {
     int sema_set;
     int* num_readers;
 
-    infoptr = getDatabase();
-    num_readers = getReadcount();
+    infoptr = getDatabase(true);
+    num_readers = getReadcount(true);
  
     // Get the set of semaphores
     sema_set = GetSemaphs(SEMA_KEY, NUM_SEMAPHS);
@@ -113,6 +77,6 @@ int main(int argc, char** argv) {
     }
 
     Wait(sema_set, 0);
-    crit_section(infoptr, num_readers, argv[1]);
+    load_data(infoptr, num_readers, argv[1]);
     Signal(sema_set, 0);
 }
