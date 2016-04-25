@@ -16,8 +16,6 @@ void Wait(int semaph, int n)
   sop.sem_op =  -1;
   sop.sem_flg = 0;
   semop(semaph,&sop,1);
-
-  printf("Wait on semaphore %d\n", n);
 }
 
 /* Unlock the semaphore n of the semaphore set semaph */
@@ -28,8 +26,6 @@ void Signal(int semaph, int n)
   sop.sem_op =  1;
   sop.sem_flg = 0;
   semop(semaph,&sop,1);
-
-  printf("Signal semaphore %d\n", n);
 }
 
 /* make an array of n semaphores with key k */
@@ -46,6 +42,10 @@ int GetSemaphs(key_t k, int n)
   return semid;
 }
 
+/*
+ * Create function for getting database so it isn't
+ * needed in all of the other files 
+ */
 struct StudentInfo* getDatabase(bool create) {
     int id;
     struct StudentInfo* infoptr;

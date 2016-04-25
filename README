@@ -1,0 +1,6 @@
+Build using the included makefile
+
+The load command takes a command line argument for the database.
+The Clean command takes a command line argument for the output file.
+Change takes the ID, followed by new name, new phone, and new address.
+Query takes the ID to print the record for.

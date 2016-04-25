@@ -42,7 +42,7 @@ int main(int argc, char** argv) {
 
     // Load database and semaphores from shared memory
     struct StudentInfo* infoptr = getDatabase(false);
-    //int* num_readers = getReadcount(false);
+    // Get ids for releasing
     int semaset = semget(SEMA_KEY, 0, 0);
     int id = shmget(KEY, SEGSIZE * MAX_DATABASE_SIZE, 0);
     int reads_id = shmget(READ_KEY, READ_SIZE, 0);
